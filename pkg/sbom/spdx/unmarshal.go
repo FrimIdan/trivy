@@ -9,8 +9,8 @@ import (
 	version "github.com/knqyf263/go-rpm-version"
 	"github.com/package-url/packageurl-go"
 	"github.com/spdx/tools-golang/json"
-	"github.com/spdx/tools-golang/spdx"
 	"github.com/spdx/tools-golang/spdx/v2/common"
+	spdx "github.com/spdx/tools-golang/spdx/v2/v2_2"
 	"github.com/spdx/tools-golang/tagvalue"
 	"golang.org/x/xerrors"
 
@@ -36,7 +36,10 @@ type TVDecoder struct {
 }
 
 func (tv *TVDecoder) Decode(v interface{}) error {
-	spdxDocument, err := tagvalue.Read(tv.r)
+	spdxDocument := spdx.Document{
+		SPDXVersion: spdx.Version,
+	}
+	err := tagvalue.ReadInto(tv.r, &spdxDocument)
 	if err != nil {
 		return xerrors.Errorf("failed to load tag-value spdx: %w", err)
 	}
@@ -45,7 +48,7 @@ func (tv *TVDecoder) Decode(v interface{}) error {
 	if !ok {
 		return xerrors.Errorf("invalid struct type tag-value decoder needed SPDX struct")
 	}
-	err = a.unmarshal(spdxDocument)
+	err = a.unmarshal(&spdxDocument)
 	if err != nil {
 		return xerrors.Errorf("failed to unmarshal spdx: %w", err)
 	}
@@ -54,11 +57,14 @@ func (tv *TVDecoder) Decode(v interface{}) error {
 }
 
 func (s *SPDX) UnmarshalJSON(b []byte) error {
-	spdxDocument, err := json.Read(bytes.NewReader(b))
+	spdxDocument := spdx.Document{
+		SPDXVersion: spdx.Version,
+	}
+	err := json.ReadInto(bytes.NewReader(b), &spdxDocument)
 	if err != nil {
 		return xerrors.Errorf("failed to load spdx json: %w", err)
 	}
-	err = s.unmarshal(spdxDocument)
+	err = s.unmarshal(&spdxDocument)
 	if err != nil {
 		return xerrors.Errorf("failed to unmarshal spdx: %w", err)
 	}
@@ -148,11 +154,11 @@ func createPackageSPDXIdentifierMap(packages []*spdx.Package) map[string]*spdx.P
 	return ret
 }
 
-func isOperatingSystem(elementID spdx.ElementID) bool {
+func isOperatingSystem(elementID common.ElementID) bool {
 	return strings.HasPrefix(string(elementID), ElementOperatingSystem)
 }
 
-func isApplication(elementID spdx.ElementID) bool {
+func isApplication(elementID common.ElementID) bool {
 	return strings.HasPrefix(string(elementID), ElementApplication)
 }
 

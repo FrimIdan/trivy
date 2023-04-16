@@ -1,17 +1,22 @@
 {
-  "spdxVersion": "SPDX-2.3",
+  "spdxVersion": "SPDX-2.2",
   "dataLicense": "CC0-1.0",
   "SPDXID": "SPDXRef-DOCUMENT",
   "name": "testdata/fixtures/fs/conda",
   "creationInfo": {
-    "licenseListVersion": "",
     "creators": [
       "Organization: aquasecurity",
       "Tool: trivy-dev"
     ],
-    "created": "2023-04-16T11:00:02Z"
+    "created": "2023-04-16T14:48:43Z"
   },
   "packages": [
+    {
+      "name": "conda-pkg",
+      "SPDXID": "SPDXRef-Application-ee5ef1aa4ac89125",
+      "downloadLocation": "NONE",
+      "sourceInfo": "Conda"
+    },
     {
       "name": "openssl",
       "SPDXID": "SPDXRef-Package-b1088cb4090e3a55",
@@ -19,10 +24,9 @@
       "downloadLocation": "NONE",
       "licenseConcluded": "OpenSSL",
       "licenseDeclared": "OpenSSL",
-      "copyrightText": "",
       "externalRefs": [
         {
-          "referenceCategory": "PACKAGE-MANAGER",
+          "referenceCategory": "PACKAGE_MANAGER",
           "referenceType": "purl",
           "referenceLocator": "pkg:conda/openssl@1.1.1q"
         }
@@ -49,7 +53,7 @@
       "licenseDeclared": "MIT",
       "externalRefs": [
         {
-          "referenceCategory": "PACKAGE-MANAGER",
+          "referenceCategory": "PACKAGE_MANAGER",
           "referenceType": "purl",
           "referenceLocator": "pkg:conda/pip@22.2.2"
         }
@@ -74,12 +78,6 @@
       "attributionTexts": [
         "SchemaVersion: 2"
       ]
-    },
-    {
-      "name": "conda-pkg",
-      "SPDXID": "SPDXRef-Application-ee5ef1aa4ac89125",
-      "downloadLocation": "NONE",
-      "sourceInfo": "Conda"
     }
   ],
   "relationships": [

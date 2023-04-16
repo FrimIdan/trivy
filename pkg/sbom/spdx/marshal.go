@@ -9,8 +9,8 @@ import (
 	"github.com/google/uuid"
 	"github.com/mitchellh/hashstructure/v2"
 	"github.com/samber/lo"
-	"github.com/spdx/tools-golang/spdx"
 	"github.com/spdx/tools-golang/spdx/v2/common"
+	spdx "github.com/spdx/tools-golang/spdx/v2/v2_2"
 	"golang.org/x/xerrors"
 	"k8s.io/utils/clock"
 
@@ -114,7 +114,7 @@ func NewMarshaler(version string, opts ...marshalOption) *Marshaler {
 
 func (m *Marshaler) Marshal(r types.Report) (*spdx.Document, error) {
 	var relationShips []*spdx.Relationship
-	packages := make(map[spdx.ElementID]*spdx.Package)
+	packages := make(map[common.ElementID]*spdx.Package)
 	pkgDownloadLocation := getPackageDownloadLocation(r.ArtifactType, r.ArtifactName)
 
 	// Root package contains OS, OS packages, language-specific packages and so on.
@@ -173,7 +173,7 @@ func (m *Marshaler) Marshal(r types.Report) (*spdx.Document, error) {
 	}, nil
 }
 
-func toPackages(packages map[spdx.ElementID]*spdx.Package) []*spdx.Package {
+func toPackages(packages map[common.ElementID]*spdx.Package) []*spdx.Package {
 	var ret []*spdx.Package
 	for _, pkg := range packages {
 		ret = append(ret, pkg)
@@ -207,7 +207,7 @@ func (m *Marshaler) parseFile(filePath string, digest digest.Digest) (spdx.File,
 		return spdx.File{}, xerrors.Errorf("failed to get %s package ID: %w", filePath, err)
 	}
 	file := spdx.File{
-		FileSPDXIdentifier: spdx.ElementID(fmt.Sprintf("File-%s", pkgID)),
+		FileSPDXIdentifier: common.ElementID(fmt.Sprintf("File-%s", pkgID)),
 		FileName:           filePath,
 		Checksums:          digestToSpdxFileChecksum(digest),
 	}
@@ -350,11 +350,11 @@ func (m *Marshaler) pkgFiles(pkg ftypes.Package) ([]*spdx.File, error) {
 	}, nil
 }
 
-func elementID(elementType, pkgID string) spdx.ElementID {
-	return spdx.ElementID(fmt.Sprintf("%s-%s", elementType, pkgID))
+func elementID(elementType, pkgID string) common.ElementID {
+	return common.ElementID(fmt.Sprintf("%s-%s", elementType, pkgID))
 }
 
-func relationShip(refA, refB spdx.ElementID, operator string) *spdx.Relationship {
+func relationShip(refA, refB common.ElementID, operator string) *spdx.Relationship {
 	ref := spdx.Relationship{
 		RefA:         common.MakeDocElementID("", string(refA)),
 		RefB:         common.MakeDocElementID("", string(refB)),
@@ -463,17 +463,17 @@ func digestToSpdxFileChecksum(d digest.Digest) []common.Checksum {
 		return nil
 	}
 
-	var alg spdx.ChecksumAlgorithm
+	var alg common.ChecksumAlgorithm
 	switch d.Algorithm() {
 	case digest.SHA1:
-		alg = spdx.SHA1
+		alg = common.SHA1
 	case digest.SHA256:
-		alg = spdx.SHA256
+		alg = common.SHA256
 	default:
 		return nil
 	}
 
-	return []spdx.Checksum{
+	return []common.Checksum{
 		{
 			Algorithm: alg,
 			Value:     d.Encoded(),

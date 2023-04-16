@@ -1,7 +1,7 @@
 package types
 
 import (
-	stypes "github.com/spdx/tools-golang/spdx"
+	stypes "github.com/spdx/tools-golang/spdx/v2/v2_2"
 
 	"github.com/aquasecurity/trivy/pkg/fanal/types"
 )

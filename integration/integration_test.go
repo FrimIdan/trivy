@@ -16,7 +16,7 @@ import (
 
 	cdx "github.com/CycloneDX/cyclonedx-go"
 	spdxjson "github.com/spdx/tools-golang/json"
-	"github.com/spdx/tools-golang/spdx"
+	spdx "github.com/spdx/tools-golang/spdx/v2/v2_2"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
@@ -168,7 +168,10 @@ func readSpdxJson(t *testing.T, filePath string) *spdx.Document {
 	require.NoError(t, err)
 	defer f.Close()
 
-	bom, err := spdxjson.Read(f)
+	bom := spdx.Document{
+		SPDXVersion: spdx.Version,
+	}
+	err = spdxjson.ReadInto(f, &bom)
 	require.NoError(t, err)
 
 	sort.Slice(bom.Relationships, func(i, j int) bool {
@@ -194,9 +197,6 @@ func readSpdxJson(t *testing.T, filePath string) *spdx.Document {
 			}
 			return bom.Packages[i].PackageSPDXIdentifier < bom.Packages[j].PackageSPDXIdentifier
 		})
-		for i := range bom.Packages {
-			bom.Packages[i].PackageVerificationCode = nil
-		}
 	}
 
 	if bom.Files != nil {
@@ -212,7 +212,7 @@ func readSpdxJson(t *testing.T, filePath string) *spdx.Document {
 	bom.CreationInfo.Created = ""
 	bom.DocumentNamespace = ""
 
-	return bom
+	return &bom
 }
 
 func execute(osArgs []string) error {
